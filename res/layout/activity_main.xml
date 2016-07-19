@@ -10,15 +10,16 @@
         android:layout_height="wrap_content"
         android:autoLink="web"
         android:padding="16dp"
-        android:text="获取源码：..."
+        
         android:textColor="@color/black"
-        android:textSize="18sp"
+        android:textSize="20sp"
         />
     <ListView 
         android:id="@+id/myListView"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_below="@id/get_source"
+        
         android:divider="@color/gray"
         android:dividerHeight="1dp"
         >

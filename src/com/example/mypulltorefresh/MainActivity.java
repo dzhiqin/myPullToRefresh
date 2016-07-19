@@ -1,10 +1,19 @@
 package com.example.mypulltorefresh;
 
+import com.example.mypulltorefresh.activity.PullableGridViewActivity;
+import com.example.mypulltorefresh.activity.PullableImageViewActivity;
+import com.example.mypulltorefresh.activity.PullableListViewActivity;
+import com.example.mypulltorefresh.activity.PullableScrollViewActivity;
+import com.example.mypulltorefresh.activity.PullableWebViewActivity;
+
 import android.app.Activity;
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
 import android.view.Window;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
@@ -21,9 +30,39 @@ public class MainActivity extends Activity {
 		requestWindowFeature(Window.FEATURE_NO_TITLE);
 		setContentView(R.layout.activity_main);
 		textView=(TextView)findViewById(R.id.get_source);
+		textView.setText("»ñÈ¡Ô´Âë£ºhttps://github.com/dzhiqin/myPullToRefresh.git");
 		mListView=(ListView)findViewById(R.id.myListView);
 		adapter=new ArrayAdapter<String>(this,android.R.layout.simple_list_item_1,items);
 		mListView.setAdapter(adapter);
+		mListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+
+			@Override
+			public void onItemClick(AdapterView<?> parent, View view,
+					int position, long id) {
+				Intent i=new Intent();
+				switch(position){
+				case 0:
+					i.setClass(MainActivity.this, PullableListViewActivity.class);
+					break;
+				case 1:
+					i.setClass(MainActivity.this, PullableScrollViewActivity.class);
+					break;
+				case 2:
+					i.setClass(MainActivity.this, PullableWebViewActivity.class);
+					break;
+				case 3:
+					i.setClass(MainActivity.this, PullableGridViewActivity.class);
+					break;
+				case 4:
+					i.setClass(MainActivity.this, PullableImageViewActivity.class);
+					break;
+				default:
+					break;
+					
+				}
+				startActivity(i);
+			}
+		});
 	}
 
 	@Override
