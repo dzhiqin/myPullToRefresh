@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<com.example.mypulltorefresh.PullableViewLayout 
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/refresh_view"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical" >
+    <include layout="@layout/header_layout"/>
+    
+    <!-- 支持所有实现pullable接口的view -->
+    <com.example.mypulltorefresh.pullableview.PullableListView
+        android:id="@+id/content_view"
+        android:layout_width="match_parent" 
+        android:layout_height="match_parent"
+        android:divider="@color/gray"
+        android:dividerHeight="1sp"/>   
+
+</com.example.mypulltorefresh.PullableViewLayout>

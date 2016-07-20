@@ -5,6 +5,7 @@ import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.content.Context;
+import android.os.AsyncTask;
 import android.util.AttributeSet;
 import android.view.MotionEvent;
 import android.view.View;
@@ -175,10 +176,10 @@ public class PullableViewLayout extends LinearLayout implements View.OnTouchList
 			default://同时过滤了多点触控的事件
 			if((currentStatus==STATUS_RELEASE_TO_REFRESH)){
 				//松手时如果是释放立即刷新状态，就去调用正在刷新任务
-				new RefreshingTask().excute();
+				new RefreshingTask().execute();
 			}else if(currentStatus==STATUS_PULL_TO_REFRESH){
 				//松手时如果是下拉刷新状态，就调用隐藏下拉头的任务
-				new HideHeaderTask().excute();
+				new HideHeaderTask().execute();
 			}
 			break;
 		}
@@ -196,7 +197,7 @@ public class PullableViewLayout extends LinearLayout implements View.OnTouchList
 	 */
 	public void refreshingFinish(){
 		currentStatus=STATUS_REFRESH_FINISHED;
-		new HideHeaderTask().excute();
+		new HideHeaderTask().execute();
 	}
 	/**
 	 * 更新下拉头中的信息
@@ -223,6 +224,100 @@ public class PullableViewLayout extends LinearLayout implements View.OnTouchList
 		}
 		
 	}
+	/**
+	 * 正在刷新的任务，在此任务中会去回调注册进来的下拉刷新监听器
+	 */
+	class RefreshingTask extends AsyncTask<Void,Integer,Void>{
+
+		@Override
+		protected Void doInBackground(Void... params) {
+			int topMargin=headerLayoutParams.topMargin;
+			/**
+			 * topMargin连续键SCROLL_SPEED,每次减去都延迟10ms，直到<=0,这中间所用掉的时间就是下拉头回滚的时间
+			 * 所谓下拉头回滚就是，下拉头从被下拉的位置上滑到topMargin=0的位置这个动作
+			 */
+			while(true){
+				topMargin=topMargin+SCROLL_SPEED;
+				if(topMargin<=0){
+					topMargin=0;
+					break;
+				}
+			}
+			/**
+		     * publishProgress如果删除了就不会有回滚的效果，不管下拉头下拉到什么位置，松手后直接出现在顶部topMargin=0 的位置
+		     * 每次调用了publishProgress()之后，就会调用onProgressUpDate()函数，此函数在UI线程里运行，起到更新界面的效果
+		     * @author Dawn 20160716
+		     */
+			publishProgress(topMargin);
+			sleep(10);
+			currentStatus=STATUS_REFRESHING;
+			publishProgress(0);
+			if(mListener!=null){
+				mListener.onRefresh();
+			}
+			return null;
+		}
+		@Override
+		protected void onProgressUpdate(Integer...topMargin){
+			/**
+			    * onProgressUpdate的参数是Integer...topMargin，
+			    * 个人理解：这是一个不确定个数的Integer[]，每次进来一个数据占用的是topMargin[0]这个位置
+			    * @author-Dawn 20160716
+			    */
+			headerLayoutParams.topMargin=topMargin[0];
+			header.setLayoutParams(headerLayoutParams);
+		}
+	}
+	/**
+	  * 隐藏下拉头的任务，当未进行下拉刷新或下拉刷新完成后，此任务将会使下拉头重新隐藏。
+	  *相比Refreshing Task多了onPostExecute，此函数从doInBackground的return获取参数
+	  *onPostExecute主要用于改变当前的状态currentStatus=STATUS_REFRESH_FINISHED
+	  * @author Dawn
+	  */
+	class HideHeaderTask extends AsyncTask<Void,Integer,Integer>{
+	
+		@Override
+		protected Integer doInBackground(Void... params) {
+			int topMargin=headerLayoutParams.topMargin;
+			while(true){
+				topMargin=topMargin+SCROLL_SPEED;//在这过程中topMargin的值越来越小，header头的位置网上移动
+				if(topMargin<=hideHeaderHeight){
+					topMargin=hideHeaderHeight;//当topMargin达到hideHeaderHeight的高度时就停止移动
+					break;
+				}
+				publishProgress(topMargin);
+				sleep(10);
+			}
+			return topMargin;
+		}
+		@Override
+		//此函数在调用publishProgress函数后执行
+		protected void onProgressUpdate(Integer...topMargin){
+			headerLayoutParams.topMargin=topMargin[0];
+			header.setLayoutParams(headerLayoutParams);
+		}
+		@Override
+		//此函数在执行完doInBackground函数后执行，topMargin是从doInBackground来的
+		protected void onPostExecute(Integer topMargin){
+			headerLayoutParams.topMargin=topMargin;
+			header.setLayoutParams(headerLayoutParams);
+			currentStatus=STATUS_REFRESH_FINISHED;
+		}
+		
+	}
+	/**
+	  * 使当前线程睡眠指定的毫秒数。
+	  *
+	  * @param time
+	  *            指定当前线程睡眠多久，以毫秒为单位
+	  */
+	 private void sleep(int time) {
+	  try {
+	   Thread.sleep(time);
+	  } catch (InterruptedException e) {
+	   e.printStackTrace();
+	  }
+	 }
 	/**
 	  * 给下拉刷新控件注册一个监听器。
 	  *

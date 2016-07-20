@@ -22,6 +22,11 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+        <activity android:name="com.example.mypulltorefresh.activity.PullableListViewActivity"></activity>
+        <activity android:name="com.example.mypulltorefresh.activity.PullableGridViewActivity"></activity>
+        <activity android:name="com.example.mypulltorefresh.activity.PullableImageViewActivity"></activity>
+        <activity android:name="com.example.mypulltorefresh.activity.PullableScrollViewActivity"></activity>
+        <activity android:name="com.example.mypulltorefresh.activity.PullableWebViewActivity"></activity>"
     </application>
 
 </manifest>
