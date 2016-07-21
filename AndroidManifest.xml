@@ -26,7 +26,7 @@
         <activity android:name="com.example.mypulltorefresh.activity.PullableGridViewActivity"></activity>
         <activity android:name="com.example.mypulltorefresh.activity.PullableImageViewActivity"></activity>
         <activity android:name="com.example.mypulltorefresh.activity.PullableScrollViewActivity"></activity>
-        <activity android:name="com.example.mypulltorefresh.activity.PullableWebViewActivity"></activity>"
+        <activity android:name="com.example.mypulltorefresh.activity.PullableWebViewActivity"></activity>
     </application>
 
 </manifest>
