@@ -16,14 +16,14 @@ import android.widget.ListView;
 
 public class PullableListViewActivity extends Activity {
 	private ListView listView;
-	private PullableViewLayout pulllayout;
+	private PullableViewLayout pullLayout;
 	private boolean isFirsttIn=true;
 	@Override
 	protected void onCreate(Bundle savedInstanceState){
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_listview);
-		pulllayout=(PullableViewLayout)findViewById(R.id.refresh_view);
-		pulllayout.setOnRefreshListener(new PullToRefreshListener(){
+		pullLayout=(PullableViewLayout)findViewById(R.id.refresh_view);
+		pullLayout.setOnRefreshListener(new PullToRefreshListener(){
 
 			@Override
 			public void onRefresh() {
@@ -32,7 +32,7 @@ public class PullableListViewActivity extends Activity {
 				}catch(InterruptedException e){
 					e.printStackTrace();
 				}
-				pulllayout.refreshingFinish();
+				pullLayout.refreshingFinish();
 			}
 			
 		}, 0);
