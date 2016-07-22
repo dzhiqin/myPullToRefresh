@@ -1,10 +1,12 @@
 package com.example.mypulltorefresh.pullableview;
 
+import com.example.mypulltorefresh.interfaces.Pullable;
+
 import android.content.Context;
 import android.util.AttributeSet;
 import android.widget.ListView;
 
-public class PullableListView extends ListView{
+public class PullableListView extends ListView implements Pullable{
 	public PullableListView(Context context)
 	{
 		super(context);

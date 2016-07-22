@@ -1,7 +1,7 @@
 package com.example.mypulltorefresh;
 
 import com.example.mypulltorefresh.utils.LogUtil;
-
+import com.example.mypulltorefresh.interfaces.Pullable;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
@@ -141,6 +141,7 @@ public class PullableViewLayout extends LinearLayout implements View.OnTouchList
 		if(!loadOnce){
 			header=getChildAt(0);
 			pullableView=getChildAt(1);
+			LogUtil.v("test", "pullableView="+pullableView);
 			//设置为负数，是为了隐藏下拉头
 			hideHeaderHeight=-header.getHeight();
 			headerLayoutParams=(MarginLayoutParams)header.getLayoutParams();
@@ -170,7 +171,7 @@ public class PullableViewLayout extends LinearLayout implements View.OnTouchList
 			break;
 		case MotionEvent.ACTION_MOVE://移动检测
 			//LogUtil.v("test", "ACTION_MOVE");
-			if(mEvent==0)
+			if(mEvent==0&&((Pullable)pullableView).canPullDown())
 			{
 				float yMove=event.getRawY();
 				int distance=(int)(yMove-yDown);
