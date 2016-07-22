@@ -1,5 +1,7 @@
 package com.example.mypulltorefresh;
 
+import com.example.mypulltorefresh.utils.LogUtil;
+
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
@@ -16,7 +18,7 @@ import android.view.animation.RotateAnimation;
 
 public class PullableViewLayout extends LinearLayout implements View.OnTouchListener{
 	/**
-	 * 下拉状态
+	 * 下拉可以刷新
 	 */
 	public static final int STATUS_PULL_TO_REFRESH=0;
 	/**
@@ -39,6 +41,10 @@ public class PullableViewLayout extends LinearLayout implements View.OnTouchList
 	 * 为了防止不同界面的下拉刷新在更新时间上相互冲突，使用id来做区分
 	 */
 	private int mId=-1;
+	/**
+	 * 过滤多点触控
+	 */
+	private int mEvent=-1;
 	/**
 	 * 下拉头的高度
 	 */
@@ -69,13 +75,15 @@ public class PullableViewLayout extends LinearLayout implements View.OnTouchList
 	 */
 	private boolean ableToPull;
 	/**
-	 * 下拉箭头的选择180°动画
+	 * 下拉箭头转动180°动画
 	 */
-	private RotateAnimation rotateAnimation;
+	//改为用java程序表示
+	//private RotateAnimation rotateAnimation;
 	/**
 	 * 绕圈旋转动画
 	 */
-	private RotateAnimation refreshingAnimation;
+	//改为用progressBar，不需要用动画来显示
+	//private RotateAnimation refreshingAnimation;
 	/**
 	 * 下拉头的view
 	 */
@@ -113,15 +121,15 @@ public class PullableViewLayout extends LinearLayout implements View.OnTouchList
 		/**
 		 * 箭头翻转和刷新圆圈的动画
 		 */
-		rotateAnimation=(RotateAnimation)AnimationUtils.loadAnimation(context, R.anim.reverse_anim);
-		refreshingAnimation=(RotateAnimation)AnimationUtils.loadAnimation(context, R.anim.refreshing_anim);
+		//rotateAnimation=(RotateAnimation)AnimationUtils.loadAnimation(context, R.anim.reverse_anim);
+		//refreshingAnimation=(RotateAnimation)AnimationUtils.loadAnimation(context, R.anim.refreshing_anim);
 		/**
 		 * 设置动画匀速运动
 		 */
-		LinearInterpolator lir=new LinearInterpolator();
-		rotateAnimation.setInterpolator(lir);
-		refreshingAnimation.setInterpolator(lir);
-		touchSlop=ViewConfiguration.get(context).getScaledTouchSlop();
+		//LinearInterpolator lir=new LinearInterpolator();
+		//rotateAnimation.setInterpolator(lir);
+		//refreshingAnimation.setInterpolator(lir);
+		touchSlop=ViewConfiguration.get(context).getScaledTouchSlop();		
 	}
 	/**
 	 * 进行一次初始化操作，将下拉头向上偏移，给pullableView注册touch事件
@@ -150,30 +158,43 @@ public class PullableViewLayout extends LinearLayout implements View.OnTouchList
 	public boolean onTouch(View v, MotionEvent event) {
 		switch(event.getActionMasked()){
 		case MotionEvent.ACTION_DOWN://触摸检测
-			yDown=event.getY();
+			//LogUtil.v("test", "ACTION_DOWN");
+			yDown=event.getRawY();
+			mEvent=0;
+			break;
+		case MotionEvent.ACTION_POINTER_DOWN:
+		case MotionEvent.ACTION_POINTER_UP:
+			//LogUtil.v("test", "ACTION_POINTER_DOWN OR UP");
+			//过滤多点触碰
+			mEvent=-1;
 			break;
 		case MotionEvent.ACTION_MOVE://移动检测
-			float yMove=event.getY();
-			int distance=(int)(yMove-yDown);
-			//去除微小的抖动误差
-			if(distance<touchSlop){
-				return false;
-			}
-			if(currentStatus!=STATUS_REFRESHING){
-				//已经在下拉状态
-				if(headerLayoutParams.topMargin>0){
-					//header在父布局的top大于0，说明已经完全拉下
-					currentStatus=STATUS_RELEASE_TO_REFRESH;
-				}else{
-					currentStatus=STATUS_PULL_TO_REFRESH;
+			//LogUtil.v("test", "ACTION_MOVE");
+			if(mEvent==0)
+			{
+				float yMove=event.getRawY();
+				int distance=(int)(yMove-yDown);
+				//去除微小的抖动误差
+				if(distance<touchSlop){					
+					return false;
 				}
-				//实时移动header，移动距离是distance/2，实际移动的距离是手指下拉距离的一半，以实现用力下拉的效果
-				headerLayoutParams.topMargin=distance/2+hideHeaderHeight;
-				header.setLayoutParams(headerLayoutParams);
+				if(currentStatus!=STATUS_REFRESHING){
+					//已经在下拉状态
+					if(headerLayoutParams.topMargin>0){
+						//header在父布局的top大于0，说明已经完全拉下
+						currentStatus=STATUS_RELEASE_TO_REFRESH;
+					}else{
+						currentStatus=STATUS_PULL_TO_REFRESH;
+					}
+					//实时移动header，移动距离是distance/2，实际移动的距离是手指下拉距离的一半，以实现用力下拉的效果
+					headerLayoutParams.topMargin=distance/2+hideHeaderHeight;
+					header.setLayoutParams(headerLayoutParams);
+				}
 			}
+			
 			break;
 		case MotionEvent.ACTION_UP://松手检测
-			default://同时过滤了多点触控的事件
+			default:
 			if((currentStatus==STATUS_RELEASE_TO_REFRESH)){
 				//松手时如果是释放立即刷新状态，就去调用正在刷新任务
 				new RefreshingTask().execute();
@@ -184,8 +205,11 @@ public class PullableViewLayout extends LinearLayout implements View.OnTouchList
 			break;
 		}
 		//触摸时时刻记得更新下拉头中的信息
+		
 		if(currentStatus==STATUS_RELEASE_TO_REFRESH||currentStatus==STATUS_PULL_TO_REFRESH){
 			updateHeaderView();
+			//记录上次的状态
+			lastStatus=currentStatus;
 			// 当前正处于下拉或释放状态，通过返回true屏蔽掉ListView的滚动事件
 		    //返回true，listView就不会网上滚动内容
 		    return true;
@@ -203,16 +227,18 @@ public class PullableViewLayout extends LinearLayout implements View.OnTouchList
 	 * 更新下拉头中的信息
 	 */
 	private void updateHeaderView(){
+		//如果状态没有改变 lastStatus=currentStatus，就不更新view，避免箭头一直上下转
 		if(lastStatus!=currentStatus){
 			if(currentStatus==STATUS_PULL_TO_REFRESH){
 				description.setText(getResources().getString(R.string.pull_to_refresh));//下拉可以刷新
 				arrow.setVisibility(View.VISIBLE);
 				progressBar.setVisibility(View.GONE);
+				rotateArrow();
 			}else if(currentStatus==STATUS_RELEASE_TO_REFRESH){
 				description.setText(getResources().getString(R.string.release_to_refresh));//释放刷新
 				arrow.setVisibility(View.VISIBLE);
 				progressBar.setVisibility(View.GONE);
-				arrow.startAnimation(rotateAnimation);
+				rotateArrow();
 			}else if(currentStatus==STATUS_REFRESHING){
 				description.setText(getResources().getString(R.string.refreshing));//正在刷新
 				arrow.setVisibility(View.GONE);
@@ -225,6 +251,28 @@ public class PullableViewLayout extends LinearLayout implements View.OnTouchList
 		
 	}
 	/**
+	 * 根据当前状态旋转箭头
+	 */
+	private void rotateArrow(){
+		LogUtil.v("test", "currentStatus="+currentStatus);
+		float pivotX=arrow.getWidth()/2f;
+		float pivotY=arrow.getHeight()/2;
+		float fromDegrees=0f;
+		float toDegrees=0f;
+		if(currentStatus==STATUS_PULL_TO_REFRESH){
+			fromDegrees=0f;
+			toDegrees=180f;
+		}else if(currentStatus==STATUS_RELEASE_TO_REFRESH){
+			fromDegrees=180f;
+			toDegrees=360f;
+		}
+		RotateAnimation animation=new RotateAnimation(fromDegrees,toDegrees,pivotX,pivotY);
+		animation.setDuration(100);
+		animation.setFillAfter(true);
+		animation.setRepeatCount(0);
+		arrow.startAnimation(animation);
+	}
+	/**
 	 * 正在刷新的任务，在此任务中会去回调注册进来的下拉刷新监听器
 	 */
 	class RefreshingTask extends AsyncTask<Void,Integer,Void>{
@@ -233,8 +281,8 @@ public class PullableViewLayout extends LinearLayout implements View.OnTouchList
 		protected Void doInBackground(Void... params) {
 			int topMargin=headerLayoutParams.topMargin;
 			/**
-			 * topMargin连续键SCROLL_SPEED,每次减去都延迟10ms，直到<=0,这中间所用掉的时间就是下拉头回滚的时间
-			 * 所谓下拉头回滚就是，下拉头从被下拉的位置上滑到topMargin=0的位置这个动作
+			 * topMargin连续减SCROLL_SPEED,每次减去都延迟10ms，直到<=0,这中间所用掉的时间就是下拉头回滚的时间
+			 * 所谓下拉头回滚就是，下拉头从被下拉的位置上滑到topMargin=0（下拉头正好显示在顶部）的位置这个动作
 			 */
 			while(true){
 				topMargin=topMargin+SCROLL_SPEED;
@@ -242,16 +290,22 @@ public class PullableViewLayout extends LinearLayout implements View.OnTouchList
 					topMargin=0;
 					break;
 				}
+			
+				/**
+			     * publishProgress如果删除了就不会有回滚的效果，不管下拉头下拉到什么位置，松手后直接出现在顶部topMargin=0 的位置
+			     * 每次调用了publishProgress()之后，就会调用onProgressUpDate()函数，此函数在UI线程里运行，起到更新界面的效果
+			     * @author Dawn 20160716
+			     */
+				publishProgress(topMargin);
+				sleep(10);
 			}
-			/**
-		     * publishProgress如果删除了就不会有回滚的效果，不管下拉头下拉到什么位置，松手后直接出现在顶部topMargin=0 的位置
-		     * 每次调用了publishProgress()之后，就会调用onProgressUpDate()函数，此函数在UI线程里运行，起到更新界面的效果
-		     * @author Dawn 20160716
-		     */
-			publishProgress(topMargin);
-			sleep(10);
 			currentStatus=STATUS_REFRESHING;
 			publishProgress(0);
+			/**
+			 * 执行完header回滚置顶之后再执行，
+			 * 外部为PullableListViewActivity里注册了setOnRefreshListener监听器，mListtener=listener
+			 * 设置mListener就是用来回调onRefresh的
+			 */
 			if(mListener!=null){
 				mListener.onRefresh();
 			}
@@ -264,6 +318,7 @@ public class PullableViewLayout extends LinearLayout implements View.OnTouchList
 			    * 个人理解：这是一个不确定个数的Integer[]，每次进来一个数据占用的是topMargin[0]这个位置
 			    * @author-Dawn 20160716
 			    */
+			updateHeaderView();
 			headerLayoutParams.topMargin=topMargin[0];
 			header.setLayoutParams(headerLayoutParams);
 		}
@@ -280,7 +335,7 @@ public class PullableViewLayout extends LinearLayout implements View.OnTouchList
 		protected Integer doInBackground(Void... params) {
 			int topMargin=headerLayoutParams.topMargin;
 			while(true){
-				topMargin=topMargin+SCROLL_SPEED;//在这过程中topMargin的值越来越小，header头的位置网上移动
+				topMargin=topMargin+SCROLL_SPEED;//在这过程中topMargin的值越来越小，header头的位置往上移动
 				if(topMargin<=hideHeaderHeight){
 					topMargin=hideHeaderHeight;//当topMargin达到hideHeaderHeight的高度时就停止移动
 					break;
@@ -293,6 +348,7 @@ public class PullableViewLayout extends LinearLayout implements View.OnTouchList
 		@Override
 		//此函数在调用publishProgress函数后执行
 		protected void onProgressUpdate(Integer...topMargin){
+			updateHeaderView();
 			headerLayoutParams.topMargin=topMargin[0];
 			header.setLayoutParams(headerLayoutParams);
 		}
