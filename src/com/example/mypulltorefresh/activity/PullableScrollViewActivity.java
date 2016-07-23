@@ -29,7 +29,7 @@ public class PullableScrollViewActivity extends Activity {
 					e.printStackTrace();
 				}
 				pullLayout.refreshingFinish();
-			}},1);
+			}},0);
 		
 	}
 

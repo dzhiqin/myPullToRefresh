@@ -2,9 +2,11 @@ package com.example.mypulltorefresh;
 
 import com.example.mypulltorefresh.utils.LogUtil;
 import com.example.mypulltorefresh.interfaces.Pullable;
+
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.content.Context;
 import android.os.AsyncTask;
@@ -70,10 +72,7 @@ public class PullableViewLayout extends LinearLayout implements View.OnTouchList
 	 * 是否已经加载过一次，用于在onLayout中进行初始化
 	 */
 	private boolean loadOnce;
-	/**
-	 * 当前是否允许下拉，只有ListView滚动到顶部的时候才允许下拉
-	 */
-	private boolean ableToPull;
+
 	/**
 	 * 下拉箭头转动180°动画
 	 */
@@ -116,6 +115,10 @@ public class PullableViewLayout extends LinearLayout implements View.OnTouchList
 	 * 下拉刷新控件的构造函数
 	 */
 
+	public PullableViewLayout(Context context){
+		super(context);
+		touchSlop=ViewConfiguration.get(context).getScaledTouchSlop();
+	}
 	public PullableViewLayout(Context context,AttributeSet attrs){
 		super(context,attrs);
 		/**
@@ -131,6 +134,10 @@ public class PullableViewLayout extends LinearLayout implements View.OnTouchList
 		//refreshingAnimation.setInterpolator(lir);
 		touchSlop=ViewConfiguration.get(context).getScaledTouchSlop();		
 	}
+	public PullableViewLayout(Context context ,AttributeSet attrs,int defStyle){
+		super(context,attrs,defStyle);
+		touchSlop=ViewConfiguration.get(context).getScaledTouchSlop();	
+	}
 	/**
 	 * 进行一次初始化操作，将下拉头向上偏移，给pullableView注册touch事件
 	 */
@@ -140,6 +147,7 @@ public class PullableViewLayout extends LinearLayout implements View.OnTouchList
 		//第一次加载onLayout进入
 		if(!loadOnce){
 			header=getChildAt(0);
+			LogUtil.v("test", "header="+header);
 			pullableView=getChildAt(1);
 			LogUtil.v("test", "pullableView="+pullableView);
 			//设置为负数，是为了隐藏下拉头
@@ -159,7 +167,7 @@ public class PullableViewLayout extends LinearLayout implements View.OnTouchList
 	public boolean onTouch(View v, MotionEvent event) {
 		switch(event.getActionMasked()){
 		case MotionEvent.ACTION_DOWN://触摸检测
-			//LogUtil.v("test", "ACTION_DOWN");
+			LogUtil.v("test", "ACTION_DOWN");
 			yDown=event.getRawY();
 			mEvent=0;
 			break;
@@ -170,7 +178,8 @@ public class PullableViewLayout extends LinearLayout implements View.OnTouchList
 			mEvent=-1;
 			break;
 		case MotionEvent.ACTION_MOVE://移动检测
-			//LogUtil.v("test", "ACTION_MOVE");
+			LogUtil.v("test", "ACTION_MOVE");
+			
 			if(mEvent==0&&((Pullable)pullableView).canPullDown())
 			{
 				float yMove=event.getRawY();

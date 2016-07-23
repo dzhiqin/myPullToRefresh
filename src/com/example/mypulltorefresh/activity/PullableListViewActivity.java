@@ -23,6 +23,7 @@ public class PullableListViewActivity extends Activity {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_listview);
 		pullLayout=(PullableViewLayout)findViewById(R.id.refresh_view);
+		//为pullableLayout布局添加一个可下拉刷新的监听器
 		pullLayout.setOnRefreshListener(new PullToRefreshListener(){
 
 			@Override
