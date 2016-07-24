@@ -7,11 +7,24 @@
     android:orientation="vertical"
     >
     <include layout="@layout/header_layout"/>
-    <com.example.mypullabletorefresh.pullableview.PullableScrollView
+    <com.example.mypulltorefresh.pullableview.PullableScrollView
         android:id="@+id/content_view"
         android:layout_width="match_parent"
-        android:layout_height="match_parent">        
+        android:layout_height="match_parent">
         
-        
-    </com.example.mypullabletorefresh.pullableview.PullableScrollView>
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="fill_parent"
+            android:gravity="center_horizontal"
+            android:orientation="vertical">
+            <ImageView
+	            android:layout_width="wrap_content"
+	            android:layout_height="wrap_content"
+	            android:background="@drawable/image01"/>
+       	    <ImageView 
+	            android:layout_width="wrap_content"
+	            android:layout_height="wrap_content"
+	            android:background="@drawable/image02"/>
+        </LinearLayout>
+    </com.example.mypulltorefresh.pullableview.PullableScrollView>
 </com.example.mypulltorefresh.PullableViewLayout>

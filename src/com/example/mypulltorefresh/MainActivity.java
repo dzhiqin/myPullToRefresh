@@ -20,7 +20,8 @@ import android.widget.TextView;
 
 public class MainActivity extends Activity {
 
-	private TextView textView;
+	private TextView resTextView;
+	private TextView noteTextView;
 	private ListView mListView;
 	private ArrayAdapter<String > adapter;
 	private String[] items={"可以下拉刷新的ListView","可以下拉刷新的ScrollView","可以下拉刷新的WebView","可以下拉刷新的GridView","可以下拉刷新的ImageView"};
@@ -29,8 +30,10 @@ public class MainActivity extends Activity {
 		super.onCreate(savedInstanceState);
 		requestWindowFeature(Window.FEATURE_NO_TITLE);
 		setContentView(R.layout.activity_main);
-		textView=(TextView)findViewById(R.id.get_source);
-		textView.setText("获取源码：https://github.com/dzhiqin/myPullToRefresh.git");
+		resTextView=(TextView)findViewById(R.id.get_source);
+		resTextView.setText("获取源码：https://github.com/dzhiqin/myPullToRefresh.git");
+		noteTextView=(TextView)findViewById(R.id.get_note);
+		noteTextView.setText("阅读笔记：http://note.youdao.com/yws/public/redirect/share?id=6ece5d238ed2e51811521c702f5b1a96&type=false");
 		mListView=(ListView)findViewById(R.id.myListView);
 		adapter=new ArrayAdapter<String>(this,android.R.layout.simple_list_item_1,items);
 		mListView.setAdapter(adapter);

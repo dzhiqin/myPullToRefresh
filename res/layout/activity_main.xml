@@ -14,12 +14,19 @@
         android:textColor="@color/black"
         android:textSize="20sp"
         />
+    <TextView
+        android:id="@+id/get_note"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:autoLink="web"
+        android:textColor="@color/black"
+        android:layout_alignParentBottom="true"/>
     <ListView 
         android:id="@+id/myListView"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_below="@id/get_source"
-        
+        android:layout_above="@id/get_note"
         android:divider="@color/gray"
         android:dividerHeight="1dp"
         >

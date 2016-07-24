@@ -1,17 +1,16 @@
 <?xml version="1.0" encoding="utf-8"?>
 <com.example.mypulltorefresh.PullableViewLayout
     android:id="@+id/refresh_view"
-xmlns:android="http://schemas.android.com/apk/res/android"
+	xmlns:android="http://schemas.android.com/apk/res/android"
 	android:layout_width="match_parent"
 	android:layout_height="match_parent"
 	android:orientation="vertical"
 	>
     <include layout="@layout/header_layout"/>
-    <com.example.mypulltorefresh.pullableview.PullableListView 
+    <com.example.mypulltorefresh.pullableview.PullableWebView 
         android:id="@+id/content_view"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:divider="@color/gray"
-        android:dividerHeight="1sp"
-        ></com.example.mypulltorefresh.pullableview.PullableListView>
+        
+        ></com.example.mypulltorefresh.pullableview.PullableWebView>
 </com.example.mypulltorefresh.PullableViewLayout>
