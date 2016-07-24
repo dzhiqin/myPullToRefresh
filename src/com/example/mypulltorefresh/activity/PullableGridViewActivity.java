@@ -5,6 +5,10 @@ import java.util.ArrayList;
 import java.util.HashMap;
 
 
+
+
+import com.example.mypulltorefresh.PullableViewLayout;
+import com.example.mypulltorefresh.PullableViewLayout.PullToRefreshListener;
 import com.example.mypulltorefresh.R;
 
 import android.app.Activity;
@@ -23,6 +27,7 @@ public class PullableGridViewActivity extends Activity {
 	private SimpleAdapter adapter;
 	private GridView gridView;
 	private String selectedItemText;
+	private PullableViewLayout pullLayout;
 	@Override
 	protected void onCreate(Bundle savedInstanceState){
 		super.onCreate(savedInstanceState);
@@ -31,6 +36,20 @@ public class PullableGridViewActivity extends Activity {
 				R.drawable.tiger,R.drawable.toucan,R.drawable.turkey,R.drawable.turtle,R.drawable.wolf};
 		texts=new String[]{"öùÓã","òùòð","Ê¨×Ó","ºï×Ó","÷çÂ¹","ÀÏ»¢","Ï¬Äñ","»ð¼¦","ÎÚ¹ê","ÀÇ"};
 		gridView=(GridView)findViewById(R.id.content_view);
+		pullLayout=(PullableViewLayout)findViewById(R.id.refresh_view);
+		pullLayout.setOnRefreshListener(new PullToRefreshListener(){
+
+			@Override
+			public void onRefresh() {
+				try{
+					Thread.sleep(3000);
+				}catch(InterruptedException e){
+					e.printStackTrace();
+				}
+				pullLayout.refreshingFinish();
+			}
+			
+		}, 1);
 		ArrayList<HashMap<String,Object>> listImageItem=new ArrayList<HashMap<String,Object>>();
 		for(int i=0;i<images.length;i++){
 			HashMap<String,Object> map=new HashMap<String,Object>();
@@ -38,6 +57,7 @@ public class PullableGridViewActivity extends Activity {
 			map.put("itemText",texts[i]);
 			listImageItem.add(map);
 		}
+		//ÕâÀïÓÐBUG
 		adapter=new SimpleAdapter(this,
 				listImageItem,
 				R.layout.grid_item,
@@ -45,7 +65,7 @@ public class PullableGridViewActivity extends Activity {
 				new int[]{R.id.itemImage,R.id.itemText}
 				);
 		gridView.setAdapter(adapter);
-		gridView.setOnItemClickListener(new OnItemClickListener(){
+	/*	gridView.setOnItemClickListener(new OnItemClickListener(){
 
 			@Override
 			public void onItemClick(AdapterView<?> parent, View view,
@@ -55,6 +75,6 @@ public class PullableGridViewActivity extends Activity {
 				Toast.makeText(PullableGridViewActivity.this, selectedItemText, Toast.LENGTH_SHORT).show();
 			}
 			
-		});
+		});*/
 	}
 }
