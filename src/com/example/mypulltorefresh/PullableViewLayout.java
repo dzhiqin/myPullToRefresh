@@ -6,7 +6,6 @@ import com.example.mypulltorefresh.interfaces.Pullable;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
-import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.content.Context;
 import android.os.AsyncTask;
@@ -14,8 +13,6 @@ import android.util.AttributeSet;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewConfiguration;
-import android.view.animation.AnimationUtils;
-import android.view.animation.LinearInterpolator;
 import android.view.animation.RotateAnimation;
 
 public class PullableViewLayout extends LinearLayout implements View.OnTouchListener{

@@ -7,9 +7,12 @@ import java.util.HashMap;
 
 
 
+
+
 import com.example.mypulltorefresh.PullableViewLayout;
 import com.example.mypulltorefresh.PullableViewLayout.PullToRefreshListener;
 import com.example.mypulltorefresh.R;
+import com.example.mypulltorefresh.utils.LogUtil;
 
 import android.app.Activity;
 import android.os.Bundle;
@@ -57,24 +60,24 @@ public class PullableGridViewActivity extends Activity {
 			map.put("itemText",texts[i]);
 			listImageItem.add(map);
 		}
-		//’‚¿Ô”–BUG
-		adapter=new SimpleAdapter(this,
+		
+		adapter=new SimpleAdapter(PullableGridViewActivity.this,
 				listImageItem,
 				R.layout.grid_item,
 				new String[]{"itemImage","itemText"},
 				new int[]{R.id.itemImage,R.id.itemText}
 				);
 		gridView.setAdapter(adapter);
-	/*	gridView.setOnItemClickListener(new OnItemClickListener(){
+		gridView.setOnItemClickListener(new OnItemClickListener(){
 
 			@Override
 			public void onItemClick(AdapterView<?> parent, View view,
 					int position, long id) {
 				HashMap<String,Object> item=(HashMap<String,Object>)parent.getItemAtPosition(position);
-				selectedItemText=(String)item.get("imageText");
+				selectedItemText=(String)item.get("itemText");
 				Toast.makeText(PullableGridViewActivity.this, selectedItemText, Toast.LENGTH_SHORT).show();
 			}
 			
-		});*/
+		});
 	}
 }
